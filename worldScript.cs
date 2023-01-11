@@ -145,6 +145,7 @@ public class worldScript : MonoBehaviour
         
     }
 
+    //Check if voxel on the Vector3 pos is a solid block 
     public bool CheckVoxel (Vector3 pos) {
         int xC = Mathf.FloorToInt(pos.x);
         int zC = Mathf.FloorToInt(pos.z);
@@ -160,6 +161,7 @@ public class worldScript : MonoBehaviour
         return blocks[Voxel(pos)].isSolid;
     }
 
+    //Get the chunk code from Vec3 pos
     public chunkGenerator GetChunk(Vector3 pos) {
         return worldChunk[Mathf.FloorToInt(pos.x / cubeData.chunkX), Mathf.FloorToInt(pos.z / cubeData.chunkX)];
     }

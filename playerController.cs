@@ -105,7 +105,6 @@ public class playerController : MonoBehaviour
 
     void groundCheck()
     {
-        //Vector3 onGroundcheck = new Vector3(transform.position.x + 0.15, transform.position.y - 2f, transform.localScale.z / 2 + transform.position.z);
         if (
             world.CheckVoxel(new Vector3(transform.position.x - 0.10f, transform.position.y - 2f, transform.position.z - 0.10f)) ||
             world.CheckVoxel(new Vector3(transform.position.x + 0.10f, transform.position.y - 2f, transform.position.z - 0.10f)) ||
@@ -121,12 +120,6 @@ public class playerController : MonoBehaviour
         else {
             isGrounded = false;
         }
-        
-        /*if(!world.CheckVoxel(onGroundcheck))
-        { 
-            GravityCalc(); 
-            isGrounded = false;
-        }*/
     }
 
     bool headCollision() {
@@ -144,14 +137,17 @@ public class playerController : MonoBehaviour
             frontCollision = true;
         } else {frontCollision = false;}
         
+        //BACK CHECK
         if(world.CheckVoxel(new Vector3(transform.position.x, transform.position.y - 1.9f, transform.position.z - 0.15f))) {
             backCollision = true;
         } else {backCollision = false;}
 
+        //RIGHT CHECK
         if(world.CheckVoxel(new Vector3(transform.position.x + 0.15f, transform.position.y - 1.9f, transform.position.z))) {
             rightCollision = true;
         } else {rightCollision = false;}
 
+        //LEFT CHECK
         if(world.CheckVoxel(new Vector3(transform.position.x - 0.15f, transform.position.y - 1.9f, transform.position.z))) {
             leftCollision = true;
         } else {leftCollision = false;}

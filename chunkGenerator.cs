@@ -36,17 +36,6 @@ public class chunkGenerator
         if(RenderOnLoading) {
             RenderChunk();
         }
-
-        /*chunk = new GameObject();
-        meshFilter = chunk.AddComponent<MeshFilter>();
-        meshRender = chunk.AddComponent<MeshRenderer>();
-        meshRender.material = world.material;
-        chunk.transform.SetParent(world.transform);
-        chunk.transform.position = new Vector3(coords.x * cubeData.chunkX, 0f, coords.z * cubeData.chunkX);
-
-        PopulateChunkMap();
-        CreateChunk();
-        ChunkRender();*/
     }
 
     public void RenderChunk() {
@@ -143,7 +132,6 @@ public class chunkGenerator
         int z = Mathf.FloorToInt(pos.z);
 
         if(!VoxelInChunk(x, y, z)) {
-            //return world.blocks[world.Voxel(pos + position)].isSolid;
             return world.CheckVoxel(pos + position);
         }
 
