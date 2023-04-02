@@ -141,7 +141,7 @@ public class worldScript : MonoBehaviour
         else if (y > terrain) {
             return 0;
         }
-        else { return 3; }
+        else { return 5; }
         
     }
 

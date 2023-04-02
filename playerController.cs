@@ -21,13 +21,14 @@ public class playerController : MonoBehaviour
     public bool Jump = false;
     public bool isGrounded = true;
     public bool isJumping = false;
-    float gravityForce;
+    public float gravityForce;
     [SerializeField]float gravity = -5f;
     [SerializeField]float jumpForce;
 
     bool frontCollision, backCollision, rightCollision, leftCollision;
 
     Vector3 velocity;
+    byte equippedBlock = 1;
 
     // Start is called before the first frame update
     void Start()
@@ -43,14 +44,14 @@ public class playerController : MonoBehaviour
         CameraLook();        
         Inputs();
         cursorRaycast();
-        groundCheck();
         checkCollisions();
         jump();
         Movement();    
+        GravityCalc();
+        groundCheck();
     }
 
     private void FixedUpdate() {
-        GravityCalc();
     }
 
     void CameraLook() {
@@ -90,7 +91,7 @@ public class playerController : MonoBehaviour
     }
 
     void GravityCalc() {
-        if(!isGrounded)
+        if(!groundCheck())
         {
             if(headCollision()) {
                 gravityForce = 0f;
@@ -99,27 +100,42 @@ public class playerController : MonoBehaviour
                 gravityForce = gravity;
                 return;
             }
-            gravityForce -= 0.1f;
+            gravityForce += gravity * Time.deltaTime;
+        }
+        else {
+            gravityForce = 0f;
         }
     }
 
-    void groundCheck()
+    bool groundCheck()
     {
-        if (
-            world.CheckVoxel(new Vector3(transform.position.x - 0.10f, transform.position.y - 2f, transform.position.z - 0.10f)) ||
-            world.CheckVoxel(new Vector3(transform.position.x + 0.10f, transform.position.y - 2f, transform.position.z - 0.10f)) ||
-            world.CheckVoxel(new Vector3(transform.position.x + 0.10f, transform.position.y - 2f, transform.position.z + 0.10f)) ||
-            world.CheckVoxel(new Vector3(transform.position.x - 0.10f, transform.position.y - 2f, transform.position.z + 0.10f))
-           ) 
-           {              
-            gravityForce = 0f;
-            isGrounded = true;
-            isJumping = false;
+        if(gravityForce > 0f)
+        {
+            return false;
         }
 
-        else {
-            isGrounded = false;
+        else
+        {
+            if (
+                world.CheckVoxel(new Vector3(transform.position.x - 0.10f, transform.position.y - 2f, transform.position.z - 0.10f)) ||
+                world.CheckVoxel(new Vector3(transform.position.x + 0.10f, transform.position.y - 2f, transform.position.z - 0.10f)) ||
+                world.CheckVoxel(new Vector3(transform.position.x + 0.10f, transform.position.y - 2f, transform.position.z + 0.10f)) ||
+                world.CheckVoxel(new Vector3(transform.position.x - 0.10f, transform.position.y - 2f, transform.position.z + 0.10f))
+            ) 
+            {              
+                float iY = Mathf.FloorToInt(transform.position.y + 1);
+                if(transform.position.y > Mathf.FloorToInt(transform.position.y)  && isJumping == true) {
+                    transform.position = new Vector3(transform.position.x, iY, transform.position.z);
+                }
+                isJumping = false;
+                return true;
+            }
+
+            else {
+                return false;
+            }
         }
+
     }
 
     bool headCollision() {
@@ -133,29 +149,29 @@ public class playerController : MonoBehaviour
 
     void checkCollisions() {
         //FRONT CHECK
-        if(world.CheckVoxel(new Vector3(transform.position.x, transform.position.y - 1.9f, transform.position.z + 0.15f))) {
+        if(world.CheckVoxel(new Vector3(transform.position.x, transform.position.y - 1.5f, transform.position.z + 0.15f)) || world.CheckVoxel(new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z + 0.15f))) {
             frontCollision = true;
         } else {frontCollision = false;}
         
         //BACK CHECK
-        if(world.CheckVoxel(new Vector3(transform.position.x, transform.position.y - 1.9f, transform.position.z - 0.15f))) {
+        if(world.CheckVoxel(new Vector3(transform.position.x, transform.position.y - 1.5f, transform.position.z - 0.15f)) || world.CheckVoxel(new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z - 0.15f))) {
             backCollision = true;
         } else {backCollision = false;}
 
         //RIGHT CHECK
-        if(world.CheckVoxel(new Vector3(transform.position.x + 0.15f, transform.position.y - 1.9f, transform.position.z))) {
+        if(world.CheckVoxel(new Vector3(transform.position.x + 0.15f, transform.position.y - 1.5f, transform.position.z)) || world.CheckVoxel(new Vector3(transform.position.x + 0.15f, transform.position.y - 0.5f, transform.position.z))) {
             rightCollision = true;
         } else {rightCollision = false;}
 
         //LEFT CHECK
-        if(world.CheckVoxel(new Vector3(transform.position.x - 0.15f, transform.position.y - 1.9f, transform.position.z))) {
+        if(world.CheckVoxel(new Vector3(transform.position.x - 0.15f, transform.position.y - 1.5f, transform.position.z)) || world.CheckVoxel(new Vector3(transform.position.x - 0.15f, transform.position.y - 0.5f, transform.position.z))) {
             leftCollision = true;
         } else {leftCollision = false;}
     }
     
     void Inputs() {
-        if( isGrounded && isJumping == false && Input.GetButtonDown("Jump")) {
-            Debug.Log("eua");
+        if(groundCheck() && isJumping == false && Input.GetButtonDown("Jump")) {
+            //Debug.Log("eua");
             Jump = true;
             isJumping = true;
         }
@@ -173,9 +189,23 @@ public class playerController : MonoBehaviour
         }
 
         if(Input.GetKeyDown(KeyCode.Mouse1)){
-            world.GetChunk(placePos).ChangeChunkMap(placePos, 2);
+            Vector3 pPos = new Vector3(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(transform.position.y), Mathf.FloorToInt(transform.position.z));
+            if(pPos == placePos || pPos - new Vector3(0f, 1f, 0f) == placePos)
+            {
+                return;
+            }
+            world.GetChunk(placePos).ChangeChunkMap(placePos, equippedBlock);
         }
 
+        if(Input.inputString != "0") {
+            try {
+                equippedBlock = byte.Parse(Input.inputString);
+            }
+            catch { return; }
+        }
+
+        //equippedBlock = byte.Parse(Input.inputString);
+        Debug.Log(equippedBlock);
     }
 
     void cursorRaycast(){
