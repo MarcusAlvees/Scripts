@@ -185,6 +185,10 @@ public class playerController : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Mouse0))
         {
+            if(!world.CheckVoxel(destroyPos)) { return; }
+            if(world.GetChunk(destroyPos).GetVoxelFromPos(destroyPos) == 4) {
+                return;
+            }
             world.GetChunk(destroyPos).ChangeChunkMap(destroyPos, 0);
         }
 

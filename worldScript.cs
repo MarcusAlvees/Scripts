@@ -131,7 +131,7 @@ public class worldScript : MonoBehaviour
             return 4;
         }
 
-        int terrain = Mathf.FloorToInt(42 * perlinNoise.Noise2D(new Vector2(pos.x, pos.z), 500, 0.25f) + 42);
+        int terrain = Mathf.FloorToInt(42 * perlinNoise.Noise2D(new Vector2(pos.x, pos.z), 1000, 0.25f) + 42);
         if(y == terrain) {
             return 1;
         }
@@ -141,7 +141,7 @@ public class worldScript : MonoBehaviour
         else if (y > terrain) {
             return 0;
         }
-        else { return 5; }
+        else { return 3; }
         
     }
 
